@@ -46,12 +46,19 @@ passport.deserializeUser(function(id, cb) {
 var app = express();
 
 // Configure view engine to render EJS templates.
-app.set('views', __dirname + '/views');
-app.set('view engine', 'ejs');
+// app.set('views', __dirname + '/views');
+// app.set('view engine', 'ejs');
+var nunjucks = require('nunjucks');
+nunjucks.configure('views', {
+    autoescape: true,
+    express: app
+});
+
+
 
 // Use application-level middleware for common functionality, including
 // logging, parsing, and session handling.
-app.use(require('morgan')('combined'));
+// app.use(require('morgan')('combined'));
 app.use(require('cookie-parser')());
 app.use(require('body-parser').urlencoded({ extended: true }));
 app.use(require('express-session')({ secret: 'keyboard cat', resave: false, saveUninitialized: false }));
@@ -64,12 +71,12 @@ app.use(passport.session());
 // Define routes.
 app.get('/',
   function(req, res) {
-    res.render('home', { user: req.user });
+    res.render('home.html', { user: req.user });
   });
 
 app.get('/login',
   function(req, res){
-    res.render('login');
+    res.render('login.html');
   });
   
 app.post('/login', 
@@ -87,7 +94,7 @@ app.get('/logout',
 app.get('/profile',
   require('connect-ensure-login').ensureLoggedIn(),
   function(req, res){
-    res.render('profile', { user: req.user });
+    res.render('profile.html', { user: req.user });
   });
 
 app.listen(3000);
